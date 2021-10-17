@@ -12,9 +12,10 @@ function Entity(initialComponents) {
     
     return this
 }
-function System(hookComponents, handler) {
+function System(hookComponents, start) {
     this.hookComponents = hookComponents
-    this.handler = handler
+    this.start = start
+    this.step = start()
     return this
 }
 function ECS() {
@@ -22,13 +23,16 @@ function ECS() {
     this.entities = []
     this.addSystems = (systems) => systems.forEach(s => this.systems.push(s))
     this.addEntities = (entities) => entities.forEach(e => this.entities.push(e))
+    this.start = () => {
+        this.systems.forEach(system => system.start())
+    }
     this.step = () => {
-        for (var system in this.systems) {
-            for (var entity in this.entities) {
-                var system_componentnames = system.hookComponents.map(comp => comp.name)
-                var match = entity.components.every(comp => comp.name in system_componentnames)
+        for (var system of this.systems) {
+            var system_componentnames = system.hookComponents.map(comp => comp.name)
+            for (var entity of this.entities) {
+                var match = Object.keys(entity.components).every(comp => system_componentnames.includes(comp))
                 if (match) {
-                    system.hander()
+                    system.step(entity)
                 }
             }
         }
@@ -39,9 +43,14 @@ const PositionComponent = Component("position", {x: 0, y: 0})
 const RenderableComponent = Component("renderable", {visible: true})
 
 const Boid = new Entity([PositionComponent])
-const RenderSystem = new System([PositionComponent], (entity) => {
-    console.log(entity)
+const RenderSystem = new System([PositionComponent], () => {
+    console.log("Start")
+
+    return (entity) => {
+        console.log("Step", entity)
+    }
 })
+console.log(RenderSystem)
 
 const ecs = new ECS()
 ecs.addSystems([RenderSystem])
