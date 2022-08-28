@@ -1,13 +1,5 @@
-const PositionComponent = new Component("position", {x: 0, y: 0, rot: 0})
+const PositionComponent = new Component("position", {pos: new Vec2(), dir: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
-
-const deg2rad = (angle) => angle * 3.1415926 / 180
-const rotate = (point) => {
-  return {
-    x: Math.cos(deg2rad(point.rot)) - Math.sin(deg2rad(point.rot)) + point.x,
-    y: Math.sin(deg2rad(point.rot)) + Math.cos(deg2rad(point.rot)) + point.y
-  }
-}
 
 const ecs = new ECS()
 const RenderSystem = new System([PositionComponent], () => {
@@ -29,10 +21,9 @@ const RenderSystem = new System([PositionComponent], () => {
 
   return (entity) => {
     if (entity.components.renderable) {
-      let pos = entity.components.position
-      console.log(pos)
-      let a = rotate(pos)
-      let b = rotate({x: a.x, y: a.y + 40, rot: pos.rot})
+      const { pos, dir, rot } = entity.components.position
+      let a = pos
+      let b = pos.plus(dir.rotate_deg(rot))  // position + direction
       console.log(b)
       ctx.moveTo(a.x, a.y)
       ctx.lineTo(b.x, b.y)
@@ -42,9 +33,9 @@ const RenderSystem = new System([PositionComponent], () => {
 })
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent])
-ExampleLine.components.position.x = 10
-ExampleLine.components.position.y = 10
-ExampleLine.components.position.rot = 45
+ExampleLine.components.position.pos = new Vec2(100, 100)
+ExampleLine.components.position.dir = new Vec2(50, 0)
+ExampleLine.components.position.rot = 0
 
 ecs.addSystems([RenderSystem])
 ecs.addEntities([ExampleLine])
