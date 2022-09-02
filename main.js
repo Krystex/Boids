@@ -20,11 +20,12 @@ const RenderSystem = new System([PositionComponent], () => {
   }
 
   return (entity) => {
+    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
     if (entity.components.renderable) {
       const { pos, dir, rot } = entity.components.position
       let a = pos
       let b = pos.plus(dir.rotate_deg(rot))  // position + direction
-      console.log(b)
+      ctx.beginPath()
       ctx.moveTo(a.x, a.y)
       ctx.lineTo(b.x, b.y)
       ctx.stroke()
@@ -34,10 +35,16 @@ const RenderSystem = new System([PositionComponent], () => {
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)
-ExampleLine.components.position.dir = new Vec2(50, 0)
-ExampleLine.components.position.rot = 0
+ExampleLine.components.position.dir = new Vec2(100, 0)
+ExampleLine.components.position.rot = -90
 
 ecs.addSystems([RenderSystem])
 ecs.addEntities([ExampleLine])
 
-ecs.step()
+const animate = () => {
+  ExampleLine.components.position.rot = (new Date().getTime() / 50)
+  ecs.step()
+  window.requestAnimationFrame(animate)
+}
+
+window.requestAnimationFrame(animate)

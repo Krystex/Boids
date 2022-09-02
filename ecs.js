@@ -52,6 +52,7 @@ function Entity(initialComponents) {
 }
 function System(hookComponents, start) {
   this.hookComponents = hookComponents
+  this.startTime = new Date().getTime()
   this.start = start
   this.step = start()
   return this
