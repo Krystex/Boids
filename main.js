@@ -2,33 +2,37 @@ const PositionComponent = new Component("position", {pos: new Vec2(), dir: new V
 const RenderableComponent = new Component("renderable", {visible: true})
 
 const ecs = new ECS()
-const CanvasRenderSystem = new System([PositionComponent], () => {
-  let canvas = document.getElementById("canvas")
-  let ctx = canvas.getContext("2d")
+const CanvasRenderSystem = new System([PositionComponent], {
+  onInit: (self) => {
+    self.canvas = document.getElementById("canvas")
+    self.ctx = canvas.getContext("2d")
 
-  const dpr = window.devicePixelRatio
-  if (dpr > 1) {
-    let width = canvas.width
-    let height = canvas.height
+    const dpr = window.devicePixelRatio
+    if (dpr > 1) {
+      let width = canvas.width
+      let height = canvas.height
 
-    canvas.width = width * dpr
-    canvas.height = height * dpr
-    canvas.style.width = width + "px"
-    canvas.style.height = height + "px"
-    
-    ctx.scale(dpr, dpr)
-  }
-
-  return (entity) => {
-    ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height)
+      self.canvas.width = width * dpr
+      self.canvas.height = height * dpr
+      self.canvas.style.width = width + "px"
+      self.canvas.style.height = height + "px"
+      
+      self.ctx.scale(dpr, dpr)
+    }
+    console.log(self)
+  },
+  beforeTick: (self) => {
+    self.ctx.clearRect(0, 0, self.ctx.canvas.width, self.ctx.canvas.height)
+  },
+  onEntity: (self, entity) => {
     if (entity.components.renderable) {
       const { pos, dir, rot } = entity.components.position
       let a = pos
       let b = pos.plus(dir.rotate_deg(rot))  // position + direction
-      ctx.beginPath()
-      ctx.moveTo(a.x, a.y)
-      ctx.lineTo(b.x, b.y)
-      ctx.stroke()
+      self.ctx.beginPath()
+      self.ctx.moveTo(a.x, a.y)
+      self.ctx.lineTo(b.x, b.y)
+      self.ctx.stroke()
     }
   }
 })
@@ -44,4 +48,5 @@ ecs.addEntities([ExampleLine])
 ecs.beforeTick = () => {
   ExampleLine.components.position.rot = (new Date().getTime() / 50)
 }
+ecs.init()
 ecs.run()

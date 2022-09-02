@@ -50,12 +50,17 @@ function Entity(initialComponents) {
   }
   return this
 }
-function System(hookComponents, start) {
-  this.hookComponents = hookComponents
-  this.startTime = new Date().getTime()
-  this.start = start
-  this.step = start()
-  return this
+class System {
+  constructor(hookComponents, options) {
+    this.hookComponents = hookComponents
+    this.startTime = new Date().getTime()
+    // onInit gets execution only once on ECS startup
+    this.onInit = options.onInit
+    // onEntity gets executed on every
+    this.onEntity = options.onEntity
+    // beforeTick gets executed before every tick
+    this.beforeTick = options.beforeTick
+  }
 }
 function ECS() {
   this.systems = []
@@ -63,14 +68,20 @@ function ECS() {
   this.addSystems = (systems) => systems.forEach(s => this.systems.push(s))
   this.addEntities = (entities) => entities.forEach(e => this.entities.push(e))
   this.beforeTick = undefined
+  this.init = () => {
+    for (const system of this.systems) {
+      system.onInit(system)
+    }
+  }
   this.tick = () => {
     for (var system of this.systems) {
+      system.beforeTick(system)
       var systemComponentNames = system.hookComponents.map(comp => comp.name)
       for (var entity of this.entities) {
         var componentNames = Object.keys(entity.components)
         var match = systemComponentNames.every(name => componentNames.includes(name))
         if (match) {
-          system.step(entity)
+          system.onEntity(system, entity)
         }
       }
     }
