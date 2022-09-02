@@ -2,40 +2,41 @@ const PositionComponent = new Component("position", {pos: new Vec2(), dir: new V
 const RenderableComponent = new Component("renderable", {visible: true})
 
 const ecs = new ECS()
-const CanvasRenderSystem = new System([PositionComponent], {
-  onInit: (self) => {
-    self.canvas = document.getElementById("canvas")
-    self.ctx = canvas.getContext("2d")
+class CanvasRenderSystem extends System {
+  constructor() {
+    super()
+    this.hookComponents = [PositionComponent]
+    this.canvas = document.getElementById("canvas")
+    this.ctx = canvas.getContext("2d")
 
     const dpr = window.devicePixelRatio
     if (dpr > 1) {
-      let width = canvas.width
-      let height = canvas.height
+      let width = this.canvas.width
+      let height = this.canvas.height
 
-      self.canvas.width = width * dpr
-      self.canvas.height = height * dpr
-      self.canvas.style.width = width + "px"
-      self.canvas.style.height = height + "px"
+      this.canvas.width = width * dpr
+      this.canvas.height = height * dpr
+      this.canvas.style.width = width + "px"
+      this.canvas.style.height = height + "px"
       
-      self.ctx.scale(dpr, dpr)
+      this.ctx.scale(dpr, dpr)
     }
-    console.log(self)
-  },
-  beforeTick: (self) => {
-    self.ctx.clearRect(0, 0, self.ctx.canvas.width, self.ctx.canvas.height)
-  },
-  onEntity: (self, entity) => {
+  }
+  beforeTick() {
+    this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
+  }
+  onEntity(entity) {
     if (entity.components.renderable) {
       const { pos, dir, rot } = entity.components.position
       let a = pos
       let b = pos.plus(dir.rotate_deg(rot))  // position + direction
-      self.ctx.beginPath()
-      self.ctx.moveTo(a.x, a.y)
-      self.ctx.lineTo(b.x, b.y)
-      self.ctx.stroke()
+      this.ctx.beginPath()
+      this.ctx.moveTo(a.x, a.y)
+      this.ctx.lineTo(b.x, b.y)
+      this.ctx.stroke()
     }
   }
-})
+}
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)

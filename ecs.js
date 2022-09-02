@@ -51,15 +51,8 @@ function Entity(initialComponents) {
   return this
 }
 class System {
-  constructor(hookComponents, options) {
-    this.hookComponents = hookComponents
+  constructor() {
     this.startTime = new Date().getTime()
-    // onInit gets execution only once on ECS startup
-    this.onInit = options.onInit
-    // onEntity gets executed on every
-    this.onEntity = options.onEntity
-    // beforeTick gets executed before every tick
-    this.beforeTick = options.beforeTick
   }
 }
 function ECS() {
@@ -69,9 +62,7 @@ function ECS() {
   this.addEntities = (entities) => entities.forEach(e => this.entities.push(e))
   this.beforeTick = undefined
   this.init = () => {
-    for (const system of this.systems) {
-      system.onInit(system)
-    }
+    this.systems = this.systems.map(system => new system())
   }
   this.tick = () => {
     for (var system of this.systems) {
@@ -81,7 +72,7 @@ function ECS() {
         var componentNames = Object.keys(entity.components)
         var match = systemComponentNames.every(name => componentNames.includes(name))
         if (match) {
-          system.onEntity(system, entity)
+          system.onEntity(entity)
         }
       }
     }
