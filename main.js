@@ -2,7 +2,7 @@ const PositionComponent = new Component("position", {pos: new Vec2(), dir: new V
 const RenderableComponent = new Component("renderable", {visible: true})
 
 const ecs = new ECS()
-const RenderSystem = new System([PositionComponent], () => {
+const CanvasRenderSystem = new System([PositionComponent], () => {
   let canvas = document.getElementById("canvas")
   let ctx = canvas.getContext("2d")
 
@@ -38,7 +38,7 @@ ExampleLine.components.position.pos = new Vec2(100, 100)
 ExampleLine.components.position.dir = new Vec2(100, 0)
 ExampleLine.components.position.rot = -90
 
-ecs.addSystems([RenderSystem])
+ecs.addSystems([CanvasRenderSystem])
 ecs.addEntities([ExampleLine])
 
 ecs.beforeTick = () => {
