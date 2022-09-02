@@ -41,10 +41,7 @@ ExampleLine.components.position.rot = -90
 ecs.addSystems([RenderSystem])
 ecs.addEntities([ExampleLine])
 
-const animate = () => {
+ecs.onStep = () => {
   ExampleLine.components.position.rot = (new Date().getTime() / 50)
-  ecs.step()
-  window.requestAnimationFrame(animate)
 }
-
-window.requestAnimationFrame(animate)
+ecs.run()
