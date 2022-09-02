@@ -41,7 +41,7 @@ ExampleLine.components.position.rot = -90
 ecs.addSystems([RenderSystem])
 ecs.addEntities([ExampleLine])
 
-ecs.onStep = () => {
+ecs.beforeTick = () => {
   ExampleLine.components.position.rot = (new Date().getTime() / 50)
 }
 ecs.run()

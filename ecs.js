@@ -63,7 +63,7 @@ function ECS() {
   this.addSystems = (systems) => systems.forEach(s => this.systems.push(s))
   this.addEntities = (entities) => entities.forEach(e => this.entities.push(e))
   this.beforeTick = undefined
-  this.step = () => {
+  this.tick = () => {
     for (var system of this.systems) {
       var systemComponentNames = system.hookComponents.map(comp => comp.name)
       for (var entity of this.entities) {
@@ -78,8 +78,8 @@ function ECS() {
   // Constant running loop
   this.run = () => {
     const loopFunc = () => {
-      this.onStep()
-      this.step()
+      this.beforeTick()
+      this.tick()
       window.requestAnimationFrame(loopFunc)
     }
     window.requestAnimationFrame(loopFunc)
