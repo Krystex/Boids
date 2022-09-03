@@ -87,6 +87,7 @@ class ECS {
   constructor() {
     this.systems = []
     this.entities = []
+    this.running = false
   }
   addSystems(systems) {
     systems.forEach(s => this.systems.push(s))
@@ -115,7 +116,7 @@ class ECS {
     const loopFunc = () => {
       this.beforeTick()
       this.tick()
-      window.requestAnimationFrame(loopFunc)
+      if (this.running) window.requestAnimationFrame(loopFunc)
     }
     window.requestAnimationFrame(loopFunc)
   }

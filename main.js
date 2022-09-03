@@ -72,4 +72,10 @@ document.querySelector("#tickbutton").onclick = () => {
   ecs.beforeTick()
   ecs.tick()
 }
+const runbutton = document.querySelector("#runbutton")
+runbutton.onclick = () => {
+  ecs.running = !ecs.running
+  runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
+  ecs.run()
+}
 // ecs.run()
