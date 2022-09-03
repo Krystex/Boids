@@ -84,7 +84,6 @@ class Entity {
 class System {
   constructor(hookComponents) {
     this.hookComponents = hookComponents
-    this.startTime = new Date().getTime()
   }
 }
 class ECS {
