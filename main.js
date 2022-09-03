@@ -1,7 +1,27 @@
 const PositionComponent = new Component("position", {pos: new Vec2(), dir: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
+const LineDrawableComponent = new Component("line", {a: new Vec2(0,0), b: new Vec2(100,0)})
 
 const ecs = new ECS()
+class PhysicsSystem extends System {
+  constructor() {
+    super([PositionComponent])
+    this.hookComponents = [PositionComponent]
+  }
+  beforeTick() {}
+  onEntity(entity) {
+    const {pos, dir, rot} = entity.components.position
+    const trans = Mat3x3.translation(pos.x, pos.y)
+    const rotat = Mat3x3.rotation(rot)
+    if (entity.components.line) {
+      const {a, b} = entity.components.line
+      entity.components.world = {
+        _a: trans.mulVec2(rotat.mulVec2(a)),
+        _b: trans.mulVec2(rotat.mulVec2(b))
+      }
+    }
+  }
+}
 class CanvasRenderSystem extends System {
   constructor() {
     super([PositionComponent])
@@ -25,24 +45,22 @@ class CanvasRenderSystem extends System {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
   }
   onEntity(entity) {
-    if (entity.components.renderable) {
-      const { pos, dir, rot } = entity.components.position
-      let a = pos
-      let b = pos.plus(dir.rotate_deg(rot))  // position + direction
+    if (entity.components.line) {
+      const { _a, _b } = entity.components.world
       this.ctx.beginPath()
-      this.ctx.moveTo(a.x, a.y)
-      this.ctx.lineTo(b.x, b.y)
+      this.ctx.moveTo(_a.x, _a.y)
+      this.ctx.lineTo(_b.x, _b.y)
       this.ctx.stroke()
     }
   }
 }
 
-const ExampleLine = new Entity([PositionComponent, RenderableComponent])
+const ExampleLine = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)
 ExampleLine.components.position.dir = new Vec2(100, 0)
 ExampleLine.components.position.rot = -90
 
-ecs.addSystems([CanvasRenderSystem])
+ecs.addSystems([PhysicsSystem, CanvasRenderSystem])
 ecs.addEntities([ExampleLine])
 
 ecs.beforeTick = () => {

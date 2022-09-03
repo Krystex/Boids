@@ -49,6 +49,7 @@ class Mat3x3 {
     ])
   }
   static rotation(angle) {
+    angle = deg2rad(angle)
     return new Mat3x3([
       [Math.cos(angle), -Math.sin(angle), 0],
       [Math.sin(angle),  Math.cos(angle), 0],
