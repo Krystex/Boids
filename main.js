@@ -4,8 +4,7 @@ const RenderableComponent = new Component("renderable", {visible: true})
 const ecs = new ECS()
 class CanvasRenderSystem extends System {
   constructor() {
-    super()
-    this.hookComponents = [PositionComponent]
+    super([PositionComponent])
     this.canvas = document.getElementById("canvas")
     this.ctx = canvas.getContext("2d")
 

@@ -51,7 +51,8 @@ function Entity(initialComponents) {
   return this
 }
 class System {
-  constructor() {
+  constructor(hookComponents) {
+    this.hookComponents = hookComponents
     this.startTime = new Date().getTime()
   }
 }
