@@ -63,17 +63,19 @@ class Mat3x3 {
   }
 }
 
-function Component(name, initialState) {
-  this.new = () => { return initialState }
-  this.name = name
-  return this
-}
-function Entity(initialComponents) {
-  this.components = {}
-  for (let component of initialComponents) {
-    this.components[component.name] = component.new()
+class Component {
+  constructor(name, initialState) {
+    this.new = () => { return initialState }
+    this.name = name
   }
-  return this
+}
+class Entity {
+  constructor(initialComponents) {
+    this.components = {}
+    for (let component of initialComponents) {
+      this.components[component.name] = component.new()
+    }
+  }
 }
 class System {
   constructor(hookComponents) {
@@ -81,16 +83,21 @@ class System {
     this.startTime = new Date().getTime()
   }
 }
-function ECS() {
-  this.systems = []
-  this.entities = []
-  this.addSystems = (systems) => systems.forEach(s => this.systems.push(s))
-  this.addEntities = (entities) => entities.forEach(e => this.entities.push(e))
-  this.beforeTick = undefined
-  this.init = () => {
+class ECS {
+  constructor() {
+    this.systems = []
+    this.entities = []
+  }
+  addSystems(systems) {
+    systems.forEach(s => this.systems.push(s))
+  }   
+  addEntities(entities) {
+    entities.forEach(e => this.entities.push(e))
+  }
+  init() {
     this.systems = this.systems.map(system => new system())
   }
-  this.tick = () => {
+  tick() {
     for (var system of this.systems) {
       system.beforeTick(system)
       var systemComponentNames = system.hookComponents.map(comp => comp.name)
@@ -104,7 +111,7 @@ function ECS() {
     }
   }
   // Constant running loop
-  this.run = () => {
+  run() {
     const loopFunc = () => {
       this.beforeTick()
       this.tick()
