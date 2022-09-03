@@ -37,6 +37,30 @@ class Vec2 {
     )
   }
 }
+class Mat3x3 {
+  constructor(mat) {
+    this.mat = mat
+  }
+  static translation(x, y) {
+    return new Mat3x3([
+      [1, 0, x],
+      [0, 1, y],
+      [0, 0, 1]
+    ])
+  }
+  static rotation(angle) {
+    return new Mat3x3([
+      [Math.cos(angle), -Math.sin(angle), 0],
+      [Math.sin(angle),  Math.cos(angle), 0],
+      [              0,                0, 1]
+    ])
+  }
+  mulVec2(vec) {
+    return new Vec2(
+      this.mat[0][0] * vec.x + this.mat[0][1] * vec.y + this.mat[0][2], 
+      this.mat[1][0] * vec.x + this.mat[1][1] * vec.y + this.mat[1][2])
+  }
+}
 
 function Component(name, initialState) {
   this.new = () => { return initialState }
