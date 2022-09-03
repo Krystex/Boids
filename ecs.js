@@ -23,6 +23,10 @@ class Vec2 {
     return new Vec2(this.x + other.x, this.y + other.y)
   }
 
+  mulScalar(scalar) {
+    return new Vec2(scalar * this.x, scalar * this.y)
+  }
+
   magnitude() {
     return Math.sqrt(this.x * this.x + this.y * this.y)
   }

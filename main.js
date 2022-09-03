@@ -1,23 +1,30 @@
-const PositionComponent = new Component("position", {pos: new Vec2(), dir: new Vec2(), rot: 0})
+const PositionComponent = new Component("position", {pos: new Vec2(), vel: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
-const LineDrawableComponent = new Component("line", {a: new Vec2(0,0), b: new Vec2(100,0)})
+const LineDrawableComponent = new Component("line", {a: new Vec2(0,0), b: new Vec2(30,0)})
 
 const ecs = new ECS()
 class PhysicsSystem extends System {
   constructor() {
     super([PositionComponent])
     this.hookComponents = [PositionComponent]
+    this.startTime = new Date().getTime()
+    this.deltaTime = 0
   }
-  beforeTick() {}
+  beforeTick() {
+    const newTime = new Date().getTime()
+    this.deltaTime = newTime - this.startTime
+    this.startTime = newTime
+  }
   onEntity(entity) {
-    const {pos, dir, rot} = entity.components.position
-    const trans = Mat3x3.translation(pos.x, pos.y)
-    const rotat = Mat3x3.rotation(rot)
+    // entity.components.position.dir = entity.components.position.dir.plus(entity.components.position.dir)
+    let {pos, vel} = entity.components.position
+    vel = vel.mulScalar(this.deltaTime / 1000)
+    entity.components.position.pos = pos.plus(vel)
     if (entity.components.line) {
       const {a, b} = entity.components.line
       entity.components.world = {
-        _a: trans.mulVec2(rotat.mulVec2(a)),
-        _b: trans.mulVec2(rotat.mulVec2(b))
+        _a: a.plus(pos).plus(vel),
+        _b: b.plus(pos).plus(vel)
       }
     }
   }
@@ -57,14 +64,13 @@ class CanvasRenderSystem extends System {
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)
-ExampleLine.components.position.dir = new Vec2(100, 0)
-ExampleLine.components.position.rot = -90
+ExampleLine.components.position.vel = new Vec2(10, 0)
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem])
 ecs.addEntities([ExampleLine])
 
 ecs.beforeTick = () => {
-  ExampleLine.components.position.rot = (new Date().getTime() / 50)
+  // here goes animation stuff
 }
 ecs.init()
 ecs.tick()
