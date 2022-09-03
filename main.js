@@ -49,4 +49,9 @@ ecs.beforeTick = () => {
   ExampleLine.components.position.rot = (new Date().getTime() / 50)
 }
 ecs.init()
-ecs.run()
+ecs.tick()
+document.querySelector("#tickbutton").onclick = () => {
+  ecs.beforeTick()
+  ecs.tick()
+}
+// ecs.run()
