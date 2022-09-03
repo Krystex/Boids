@@ -19,7 +19,7 @@ class PhysicsSystem extends System {
   onEntity(entity) {
     let {pos, vel} = entity.components.position
     // Compute velocity dependend on elapsed time
-    vel = vel.mulScalar(this.deltaTime / 1000)
+    vel = vel.mul_scalar(this.deltaTime / 1000)
     // Respect bounds
     if (pos.x < this.bounds.minx) pos.x = this.bounds.maxx
     if (pos.x > this.bounds.maxx) pos.x = this.bounds.minx

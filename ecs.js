@@ -23,14 +23,28 @@ class Vec2 {
     return new Vec2(this.x + other.x, this.y + other.y)
   }
 
-  mulScalar(scalar) {
+  /**
+   * Vector-scalar product
+   * @param {number} scalar 
+   * @returns Vec2
+   */
+  mul_scalar(scalar) {
     return new Vec2(scalar * this.x, scalar * this.y)
   }
 
+  /**
+   * Magnitude of vector
+   * @returns {number} magnitude
+   */
   magnitude() {
     return Math.sqrt(this.x * this.x + this.y * this.y)
   }
 
+  /**
+   * Rotate a vector
+   * @param {number} angle in degrees
+   * @returns 
+   */
   rotate_deg(angle) {
     const magnitude = this.magnitude()
     return new Vec2(
@@ -45,6 +59,12 @@ class Mat3x3 {
   constructor(mat) {
     this.mat = mat
   }
+  /**
+   * Create a translation matrix
+   * @param {number} x x-displacement
+   * @param {number} y y-displacement
+   * @returns {Mat3x3}
+   */
   static translation(x, y) {
     return new Mat3x3([
       [1, 0, x],
@@ -52,6 +72,11 @@ class Mat3x3 {
       [0, 0, 1]
     ])
   }
+  /**
+   * Create a rotation matrix
+   * @param {number} angle angle in degrees
+   * @returns {Mat3x3}
+   */
   static rotation(angle) {
     angle = deg2rad(angle)
     return new Mat3x3([
@@ -60,7 +85,12 @@ class Mat3x3 {
       [              0,                0, 1]
     ])
   }
-  mulVec2(vec) {
+  /**
+   * Matrix-Vector product (for homogenous coordinate system)
+   * @param {*} vec 
+   * @returns 
+   */
+  mul_vec2(vec) {
     return new Vec2(
       this.mat[0][0] * vec.x + this.mat[0][1] * vec.y + this.mat[0][2], 
       this.mat[1][0] * vec.x + this.mat[1][1] * vec.y + this.mat[1][2])
@@ -68,6 +98,11 @@ class Mat3x3 {
 }
 
 class Component {
+  /**
+   * Construct component type
+   * @param {string} name Name of component
+   * @param {object} initialState Initial State, which gets used for creation of every new entity
+   */
   constructor(name, initialState) {
     this.new = () => { return initialState }
     this.name = name
@@ -82,6 +117,9 @@ class Entity {
   }
 }
 class System {
+  /**
+   * @param {Array<Component>} hookComponents 
+   */
   constructor(hookComponents) {
     this.hookComponents = hookComponents
   }
@@ -92,9 +130,15 @@ class ECS {
     this.entities = []
     this.running = false
   }
+  /**
+   * @param {Array<System>} systems 
+   */
   addSystems(systems) {
     systems.forEach(s => this.systems.push(s))
-  }   
+  }
+  /**
+   * @param {Array<Entity>} entities 
+   */
   addEntities(entities) {
     entities.forEach(e => this.entities.push(e))
   }
