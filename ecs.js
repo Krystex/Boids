@@ -143,17 +143,17 @@ class ECS {
     entities.forEach(e => this.entities.push(e))
   }
   init() {
-    this.systems = this.systems.map(system => new system())
+    this.systems = this.systems.map(system => new system(this))
   }
   tick() {
     for (var system of this.systems) {
-      system.beforeTick(system)
+      system.beforeTick(this, system)
       var systemComponentNames = system.hookComponents.map(comp => comp.name)
       for (var entity of this.entities) {
         var componentNames = Object.keys(entity.components)
         var match = systemComponentNames.every(name => componentNames.includes(name))
         if (match) {
-          system.onEntity(entity)
+          system.onEntity(this, entity)
         }
       }
     }

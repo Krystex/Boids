@@ -11,12 +11,12 @@ class PhysicsSystem extends System {
     this.deltaTime = 0
     this.bounds = {minx: 0, miny: 0, maxx: 800, maxy: 800}
   }
-  beforeTick() {
+  beforeTick(ecs) {
     const newTime = new Date().getTime()
     this.deltaTime = newTime - this.startTime
     this.startTime = newTime
   }
-  onEntity(entity) {
+  onEntity(ecs, entity) {
     let {pos, vel} = entity.components.position
     // Compute velocity dependend on elapsed time
     vel = vel.mul_scalar(this.deltaTime / 1000)
