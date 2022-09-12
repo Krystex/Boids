@@ -55,10 +55,10 @@ class CanvasRenderSystem extends System {
       this.ctx.scale(dpr, dpr)
     }
   }
-  beforeTick() {
+  beforeTick(_) {
     this.ctx.clearRect(0, 0, this.ctx.canvas.width, this.ctx.canvas.height)
   }
-  onEntity(entity) {
+  onEntity(_, entity) {
     if (entity.components.line) {
       const { _a, _b } = entity.components.world
       this.ctx.beginPath()
@@ -68,12 +68,31 @@ class CanvasRenderSystem extends System {
     }
   }
 }
+class RunECSSystem extends System {
+  constructor(ecs) {
+    super([])
+
+    const runbutton = document.querySelector("#runbutton")
+    const tickbutton = document.querySelector("#tickbutton")
+    runbutton.onclick = () => {
+      ecs.running = !ecs.running
+      runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
+      ecs.run()
+    }
+    tickbutton.onclick = () => {
+      ecs.beforeTick()
+      ecs.tick()
+    }
+  }
+  beforeTick() {}
+  onEntity(_) {}
+}
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)
 ExampleLine.components.position.vel = new Vec2(10, 0)
 
-ecs.addSystems([PhysicsSystem, CanvasRenderSystem])
+ecs.addSystems([PhysicsSystem, CanvasRenderSystem, RunECSSystem])
 ecs.addEntities([ExampleLine])
 
 ecs.beforeTick = () => {
@@ -81,14 +100,5 @@ ecs.beforeTick = () => {
 }
 ecs.init()
 ecs.tick()
-document.querySelector("#tickbutton").onclick = () => {
-  ecs.beforeTick()
-  ecs.tick()
-}
-const runbutton = document.querySelector("#runbutton")
-runbutton.onclick = () => {
-  ecs.running = !ecs.running
-  runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
-  ecs.run()
-}
+
 // ecs.run()
