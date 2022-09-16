@@ -80,7 +80,6 @@ class RunECSSystem extends System {
       ecs.run()
     }
     tickbutton.onclick = () => {
-      ecs.beforeTick()
       ecs.tick()
     }
   }
@@ -95,9 +94,6 @@ ExampleLine.components.position.vel = new Vec2(10, 0)
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, RunECSSystem])
 ecs.addEntities([ExampleLine])
 
-ecs.beforeTick = () => {
-  // here goes animation stuff
-}
 ecs.init()
 ecs.tick()
 

@@ -161,7 +161,6 @@ class ECS {
   // Constant running loop
   run() {
     const loopFunc = () => {
-      this.beforeTick()
       this.tick()
       if (this.running) window.requestAnimationFrame(loopFunc)
     }
