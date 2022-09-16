@@ -142,23 +142,34 @@ class ECS {
   addEntities(entities) {
     entities.forEach(e => this.entities.push(e))
   }
+  /**
+   * Initialization; create all systems
+   */
   init() {
     this.systems = this.systems.map(system => new system(this))
   }
+  /**
+   * Executes one tick. This consists of
+   * - loop through all systems, execute `beforeTick` function
+   *   - loop through all entities, see if system is hooked to current entity
+   *   - if entity is hooked, execute `onEntity` function
+   */
   tick() {
-    for (var system of this.systems) {
+    for (const system of this.systems) {
       system.beforeTick(this, system)
-      var systemComponentNames = system.hookComponents.map(comp => comp.name)
-      for (var entity of this.entities) {
-        var componentNames = Object.keys(entity.components)
-        var match = systemComponentNames.every(name => componentNames.includes(name))
+      const systemComponentNames = system.hookComponents.map(comp => comp.name)
+      for (const entity of this.entities) {
+        const componentNames = Object.keys(entity.components)
+        const match = systemComponentNames.every(name => componentNames.includes(name))
         if (match) {
           system.onEntity(this, entity)
         }
       }
     }
   }
-  // Constant running loop
+  /**
+   * Continuous running loop
+   */
   run() {
     const loopFunc = () => {
       this.tick()
