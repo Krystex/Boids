@@ -105,8 +105,8 @@ class Mat3x3 {
       // Cheat sheet: https://commons.wikimedia.org/wiki/File:3x3-Matrix-Multiplication.png
       // Col 0                                                                                           Col 1                                                                                             Col 2
       [this.mat[0][0] * mat.mat[0][0] + this.mat[0][1] * mat.mat[1][0] + this.mat[0][2] * mat.mat[2][0], this.mat[0][0] * mat.mat[0][1] + this.mat[0][1] * mat.mat[1][1] + this.mat[0][2] * mat.mat[2][1], this.mat[0][0] * mat.mat[0][2] + this.mat[0][1] * mat.mat[1][2] + this.mat[0][2] * mat.mat[2][2]],
-      [this.mat[1][0] * mat.mat[0][0] + this.mat[1][1] * mat.mat[1][0] + this.mat[1][2] * mat.mat[1][0], this.mat[1][0] * mat.mat[0][1] + this.mat[1][1] * mat.mat[1][1] + this.mat[1][2] * mat.mat[2][1], this.mat[1][0] * mat.mat[0][2] + this.mat[1][1] * mat.mat[1][2] + this.mat[1][2] * mat.mat[2][2]],
-      [this.mat[2][0] * mat.mat[0][0] + this.mat[2][1] * mat.mat[1][0] + this.mat[2][2] * mat.mat[1][0], this.mat[2][0] * mat.mat[0][1] + this.mat[2][1] * mat.mat[1][1] + this.mat[2][2] * mat.mat[2][1], this.mat[2][0] * mat.mat[0][2] + this.mat[2][1] * mat.mat[1][2] + this.mat[2][2] * mat.mat[2][2]]
+      [this.mat[1][0] * mat.mat[0][0] + this.mat[1][1] * mat.mat[1][0] + this.mat[1][2] * mat.mat[2][0], this.mat[1][0] * mat.mat[0][1] + this.mat[1][1] * mat.mat[1][1] + this.mat[1][2] * mat.mat[2][1], this.mat[1][0] * mat.mat[0][2] + this.mat[1][1] * mat.mat[1][2] + this.mat[1][2] * mat.mat[2][2]],
+      [this.mat[2][0] * mat.mat[0][0] + this.mat[2][1] * mat.mat[1][0] + this.mat[2][2] * mat.mat[2][0], this.mat[2][0] * mat.mat[0][1] + this.mat[2][1] * mat.mat[1][1] + this.mat[2][2] * mat.mat[2][1], this.mat[2][0] * mat.mat[0][2] + this.mat[2][1] * mat.mat[1][2] + this.mat[2][2] * mat.mat[2][2]]
     ])
   }
 
