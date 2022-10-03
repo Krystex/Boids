@@ -109,6 +109,17 @@ class Mat3x3 {
       [this.mat[2][0] * mat.mat[0][0] + this.mat[2][1] * mat.mat[1][0] + this.mat[2][2] * mat.mat[1][0], this.mat[2][0] * mat.mat[0][1] + this.mat[2][1] * mat.mat[1][1] + this.mat[2][2] * mat.mat[2][1], this.mat[2][0] * mat.mat[0][2] + this.mat[2][1] * mat.mat[1][2] + this.mat[2][2] * mat.mat[2][2]]
     ])
   }
+
+  /**
+   * General multiplication
+   * @param {Vec2 | Mat3x3} other 
+   * @returns {Vec2 | Mat3x3}
+   */
+  mul(other) {
+    console.log(other instanceof Vec2, other instanceof Mat3x3)
+    if (other instanceof Vec2) return this.mul_vec2(other)
+    else if (other instanceof Mat3x3) return this.mul_mat3x3(other)
+  }
 }
 
 class Component {
