@@ -4,6 +4,7 @@
  * @returns {float} angle in radians
  */
 const deg2rad = (angle) => angle * 3.1415926 / 180
+const rad2deg = (angle) => angle * 180 / 3.1415926
 
 class Vec2 {
   /**
@@ -38,6 +39,23 @@ class Vec2 {
    */
   magnitude() {
     return Math.sqrt(this.x * this.x + this.y * this.y)
+  }
+
+  /**
+   * Calculate unit vector (norm)
+   * @returns {Vec2}
+   */
+  unit() {
+    const magnitude = this.magnitude()
+    return new Vec2(this.x / magnitude, this.y / magnitude)
+  }
+
+  /**
+   * Calculate angle of vector, with other vector being (0,1)
+   * @returns {Number} angle in degrees
+   */
+  angle() {
+    return rad2deg(Math.atan2(this.x, this.y))
   }
 
   /**
