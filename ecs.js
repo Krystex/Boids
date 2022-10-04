@@ -200,6 +200,6 @@ class ECS {
       this.tick()
       if (this.running) window.requestAnimationFrame(loopFunc)
     }
-    window.requestAnimationFrame(loopFunc)
+    if (this.running) window.requestAnimationFrame(loopFunc)
   }
 }
