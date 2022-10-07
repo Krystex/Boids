@@ -34,6 +34,15 @@ class Vec2 {
   }
 
   /**
+   * Multiplication
+   * @param {Number} other can be Scalar
+   * @returns {Vec2}
+   */
+  mul(other) {
+    if (!isNaN(other)) return this.mul_scalar(other)
+  }
+
+  /**
    * Magnitude of vector
    * @returns {number} magnitude
    */
