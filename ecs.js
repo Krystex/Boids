@@ -143,7 +143,6 @@ class Mat3x3 {
    * @returns {Vec2 | Mat3x3}
    */
   mul(other) {
-    console.log(other instanceof Vec2, other instanceof Mat3x3)
     if (other instanceof Vec2) return this.mul_vec2(other)
     else if (other instanceof Mat3x3) return this.mul_mat3x3(other)
   }

@@ -1,6 +1,6 @@
 const PositionComponent = new Component("position", {pos: new Vec2(), vel: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
-const LineDrawableComponent = new Component("line", {a: new Vec2(0,0), b: new Vec2(20,0)})
+const LineDrawableComponent = new Component("line", {})
 
 const ecs = new ECS()
 class PhysicsSystem extends System {
@@ -9,14 +9,14 @@ class PhysicsSystem extends System {
     this.hookComponents = [PositionComponent]
     this.startTime = new Date().getTime()
     this.deltaTime = 0
-    this.bounds = {minx: 0, miny: 0, maxx: 800, maxy: 800}
+    this.bounds = {minx: 0, miny: 0, maxx: 400, maxy: 400}
   }
-  beforeTick(ecs) {
+  beforeTick(_) {
     const newTime = new Date().getTime()
     this.deltaTime = newTime - this.startTime
     this.startTime = newTime
   }
-  onEntity(ecs, entity) {
+  onEntity(_, entity) {
     let {pos, vel} = entity.components.position
     // Compute velocity dependend on elapsed time
     vel = vel.mul_scalar(this.deltaTime / 1000)
@@ -90,7 +90,7 @@ class RunECSSystem extends System {
 
 const ExampleLine = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 ExampleLine.components.position.pos = new Vec2(100, 100)
-ExampleLine.components.position.vel = new Vec2(10, 0)
+ExampleLine.components.position.vel = new Vec2(10, 20)
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, RunECSSystem])
 ecs.addEntities([ExampleLine])
