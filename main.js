@@ -28,10 +28,11 @@ class PhysicsSystem extends System {
     // Compute new position (add velocity to position)
     entity.components.position.pos = pos.plus(vel)
     if (entity.components.line) {
-      const {a, b} = entity.components.line
+      const trans = Mat3x3.translation(pos.x, pos.y)
+      const rot = Mat3x3.rotation(vel.angle())
       entity.components.world = {
-        _a: a.plus(pos).plus(vel),
-        _b: b.plus(pos).plus(vel)
+        _a: trans.mul(new Vec2(0, 0)),
+        _b: trans.mul(vel.unit().mul(10)),
       }
     }
   }
