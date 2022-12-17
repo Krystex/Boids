@@ -155,7 +155,7 @@ class Component {
    * @param {object} initialState Initial State, which gets used for creation of every new entity
    */
   constructor(name, initialState) {
-    this.new = () => { return initialState }
+    this.new = () => { return Object.assign({}, initialState) }
     this.name = name
   }
 }
