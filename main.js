@@ -19,7 +19,7 @@ class PhysicsSystem extends System {
   onEntity(_, entity) {
     let {pos, vel} = entity.components.position
     // Compute velocity dependend on elapsed time
-    vel = vel.mul_scalar(this.deltaTime / 1000)
+    vel = vel.mul(this.deltaTime / 1000)
     // Respect bounds
     if (pos.x < this.bounds.minx) pos.x = this.bounds.maxx
     if (pos.x > this.bounds.maxx) pos.x = this.bounds.minx
@@ -29,7 +29,7 @@ class PhysicsSystem extends System {
     entity.components.position.pos = pos.plus(vel)
     if (entity.components.line) {
       const trans = Mat3x3.translation(pos.x, pos.y)
-      const rot = Mat3x3.rotation(vel.angle())
+      // const rot = Mat3x3.rotation(vel.angle())
       entity.components.world = {
         _a: trans.mul(new Vec2(0, 0)),
         _b: trans.mul(vel.unit().mul(10)),
@@ -87,8 +87,28 @@ class RunECSSystem extends System {
   beforeTick() {}
   onEntity(_) {}
 }
+class BoidSystem extends System {
+  constructor() {
+    super([PositionComponent])
+    this.distanceMap = {}
+  }
+  beforeTick(ecs) {
+    // Create distance map: length from one point to every other point
+    for (let i=0; i<ecs.entities.length; i++) {
+      this.distanceMap[i] = {}
+      for (let j=0; j<ecs.entities.length; j++) {
+        if (i !== j) {
+          this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.position.pos, ecs.entities[j].components.position.pos)
+        }
+      }
+    }
+  }
+  onEntity(_, entity) {
 
-ecs.addSystems([PhysicsSystem, CanvasRenderSystem, RunECSSystem])
+  }
+}
+
+ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
 for (let i=0; i<20; i++) {
   let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
