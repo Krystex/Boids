@@ -88,12 +88,14 @@ class RunECSSystem extends System {
   onEntity(_) {}
 }
 
-const ExampleLine = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
-ExampleLine.components.position.pos = new Vec2(100, 100)
-ExampleLine.components.position.vel = new Vec2(10, 20)
-
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, RunECSSystem])
-ecs.addEntities([ExampleLine])
+
+for (let i=0; i<20; i++) {
+  let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
+  boid.components.position.pos = new Vec2(Math.random() * 400, Math.random() * 400)
+  boid.components.position.vel = new Vec2(Math.random() * 40 - 20, Math.random() * 40 - 20)
+  ecs.addEntities([boid])
+}
 
 ecs.init()
 ecs.tick()
