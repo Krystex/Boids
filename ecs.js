@@ -81,6 +81,15 @@ class Vec2 {
       Math.sin(deg2rad(angle)) * magnitude
     )
   }
+
+  /**
+   * Distance between two vectors
+   * @param {Vec2} a Vector one
+   * @param {Vec2} b Vector two
+   */
+  static dist(a, b) {
+    return new Vec2(b.x - a.x, b.y - a.y).magnitude()
+  }
 }
 class Mat3x3 {
   constructor(mat) {
