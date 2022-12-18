@@ -91,6 +91,7 @@ class BoidSystem extends System {
   constructor() {
     super([PositionComponent])
     this.distanceMap = {}
+    this.ui = document.querySelector("#distance")
   }
   beforeTick(ecs) {
     // Create distance map: length from one point to every other point
@@ -112,7 +113,7 @@ class BoidSystem extends System {
         nearBoids.push(ecs.entities[oEntityId])
       }
     }
-
+    
     // 1. Seperation
     if (true) {
       /// Approach one: position
@@ -145,12 +146,20 @@ class BoidSystem extends System {
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
-for (let i=0; i<20; i++) {
+for (let i=0; i<30; i++) {
   let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
   boid.components.position.pos = new Vec2(Math.random() * 400, Math.random() * 400)
-  boid.components.position.vel = new Vec2(Math.random() * 40 - 20, Math.random() * 40 - 20)
+  boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30))
   ecs.addEntities([boid])
 }
+
+// a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
+// a.components.position.pos = new Vec2(0, 0)
+// a.components.position.vel = new Vec2(30, -15)
+// b = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
+// b.components.position.pos = new Vec2(0, 200)
+// b.components.position.vel = new Vec2(30, 0)
+// ecs.addEntities([a, b])
 
 ecs.init()
 ecs.tick()
