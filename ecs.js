@@ -225,6 +225,8 @@ class ECS {
     this.entities = []
     this.running = false
     this.lastEntityId = 0
+    this.startTime = new Date().getTime()
+    this.deltaTime = 0
   }
   /**
    * @param {Array<System>} systems 
@@ -254,9 +256,14 @@ class ECS {
    *   - if entity is hooked, execute `onEntity` function
    */
   tick() {
+    const newTime = new Date().getTime()
+    this.deltaTime = newTime - this.startTime
+    this.startTime = newTime
+    // Iterate through all systems
     for (const system of this.systems) {
       system.beforeTick(this, system)
       const systemComponentNames = system.hookComponents.map(comp => comp.name)
+      // Iterate through all entities
       for (const entity of this.entities) {
         const componentNames = Object.keys(entity.components)
         const match = systemComponentNames.every(name => componentNames.includes(name))
@@ -275,6 +282,17 @@ class ECS {
       if (this.running) window.requestAnimationFrame(loopFunc)
     }
     if (this.running) window.requestAnimationFrame(loopFunc)
+  }
+
+  pause() {
+    if (this.running) {
+      this.running = false
+    } else {
+      const newTime = new Date().getTime()
+      this.deltaTime = newTime - this.startTime
+      this.startTime = newTime
+      this.running = true
+    }
   }
 }
 

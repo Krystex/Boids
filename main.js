@@ -7,19 +7,13 @@ class PhysicsSystem extends System {
   constructor() {
     super([PositionComponent])
     this.hookComponents = [PositionComponent]
-    this.startTime = new Date().getTime()
-    this.deltaTime = 0
     this.bounds = {minx: 0, miny: 0, maxx: 400, maxy: 400}
   }
-  beforeTick(_) {
-    const newTime = new Date().getTime()
-    this.deltaTime = newTime - this.startTime
-    this.startTime = newTime
-  }
-  onEntity(_, entity) {
+  beforeTick(_) {}
+  onEntity(ecs, entity) {
     let {pos, vel} = entity.components.position
     // Compute velocity dependend on elapsed time
-    vel = vel.mul(this.deltaTime / 1000)
+    vel = vel.mul(ecs.deltaTime / 1000)
     // Respect bounds
     if (pos.x < this.bounds.minx) pos.x = this.bounds.maxx
     if (pos.x > this.bounds.maxx) pos.x = this.bounds.minx
