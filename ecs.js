@@ -15,13 +15,27 @@ class Vec2 {
   constructor(x=0, y=0) {
     this.x = x; this.y = y
   }
+
+  toString() {
+    return `[${this.x.toFixed(2)} ${this.y.toFixed(2)}]`
+  }
+
   /**
    * Vector addition
    * @param {Vec2} other 
    * @returns {Vec2}
    */
-  plus(other) {
+  add(other) {
     return new Vec2(this.x + other.x, this.y + other.y)
+  }
+
+  /**
+   * Vector subtraction
+   * @param {Vec2} other 
+   * @returns {Vec2}
+   */
+  sub(other) {
+    return new Vec2(this.x - other.x, this.y - other.y)
   }
 
   /**
@@ -86,9 +100,30 @@ class Vec2 {
    * Distance between two vectors
    * @param {Vec2} a Vector one
    * @param {Vec2} b Vector two
+   * @returns {Number} distance
    */
   static dist(a, b) {
     return new Vec2(b.x - a.x, b.y - a.y).magnitude()
+  }
+
+  /**
+   * Calculates the dot product between two vectors
+   * @param {Vec2} a Vector one
+   * @param {Vec2} b Vector two
+   * @returns {Number} dot product
+   */
+  static dot(a, b) {
+    return a.x * b.x + a.y * b.y 
+  }
+
+  /**
+   * Calculates the cosine between two vectors
+   * @param {Vec2} a Vector one
+   * @param {Vec2} b Vector two
+   * @returns {Number} cosine
+   */
+  static cos(a, b) {
+    return Vec2.dot(a, b) / (a.magnitude() * b.magnitude())
   }
 }
 class Mat3x3 {
