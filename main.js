@@ -65,6 +65,7 @@ class CanvasRenderSystem extends System {
       this.ctx.beginPath()
       this.ctx.moveTo(_a.x, _a.y)
       this.ctx.lineTo(_b.x, _b.y)
+      this.ctx.strokeStyle = "#FFFFFF";
       this.ctx.stroke()
     }
   }
@@ -91,7 +92,6 @@ class BoidSystem extends System {
   constructor() {
     super([PositionComponent])
     this.distanceMap = {}
-    this.ui = document.querySelector("#distance")
   }
   beforeTick(ecs) {
     // Create distance map: length from one point to every other point
