@@ -26,7 +26,7 @@ class PhysicsSystem extends System {
     if (pos.y < this.bounds.miny) pos.y = this.bounds.maxy
     if (pos.y > this.bounds.maxy) pos.y = this.bounds.miny
     // Compute new position (add velocity to position)
-    entity.components.position.pos = pos.plus(vel)
+    entity.components.position.pos = pos.add(vel)
     if (entity.components.line) {
       const trans = Mat3x3.translation(pos.x, pos.y)
       // const rot = Mat3x3.rotation(vel.angle())
@@ -94,17 +94,52 @@ class BoidSystem extends System {
   }
   beforeTick(ecs) {
     // Create distance map: length from one point to every other point
-    for (let i=0; i<ecs.entities.length; i++) {
-      this.distanceMap[i] = {}
-      for (let j=0; j<ecs.entities.length; j++) {
-        if (i !== j) {
-          this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.position.pos, ecs.entities[j].components.position.pos)
+    for (const a of ecs.entities) {
+      this.distanceMap[a.id] = {}
+      for (const b of ecs.entities) {
+        if (a.id !== b.id) {
+          this.distanceMap[a.id][b.id] = Vec2.dist(ecs.entities[a.id].components.position.pos, ecs.entities[b.id].components.position.pos)
         }
       }
     }
   }
   onEntity(_, entity) {
+    // Calculate near boids
+    const maxDistance = 20.
+    let nearBoids = []
+    for (const [oEntityId, distance] of Object.entries(this.distanceMap[entity.id])) {
+      if (distance < maxDistance) {
+        nearBoids.push(ecs.entities[oEntityId])
+      }
+    }
 
+    // 1. Seperation
+    if (true) {
+      /// Approach one: position
+      const factor = 0.5
+      for (const nearBoid of nearBoids) {
+        const dist = this.distanceMap[entity.id][nearBoid.id]
+        const selfPos = entity.components.position.pos
+        const otherPos = nearBoid.components.position.pos
+        const inverseDistance = 1. / dist
+        const away = otherPos.sub(selfPos).mul(inverseDistance).mul(factor)
+        entity.components.position.vel = entity.components.position.vel.sub(away)
+      }
+    } else {
+      /// Approach two: velocity
+      const factor = 0.5
+      const oldMagnitude = entity.components.position.vel.magnitude() // Save current magnitude, so we can restore it later
+      let force = new Vec2(0, 0)
+      for (const nearBoid of nearBoids) {
+        const dist = this.distanceMap[entity.id][nearBoid.id]
+        const selfVel = entity.components.position.vel
+        const otherVel = nearBoid.components.position.vel
+        force = force.add(otherVel.sub(selfVel).mul(1 / dist))
+      }
+      force = force.mul(factor)
+      entity.components.position.vel = entity.components.position.vel.add(force)
+      entity.components.position.vel = entity.components.position.vel.unit().mul(oldMagnitude)
+    }
   }
 }
 
