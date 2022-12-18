@@ -224,6 +224,7 @@ class ECS {
     this.systems = []
     this.entities = []
     this.running = false
+    this.lastEntityId = 0
   }
   /**
    * @param {Array<System>} systems 
@@ -235,7 +236,10 @@ class ECS {
    * @param {Array<Entity>} entities 
    */
   addEntities(entities) {
-    entities.forEach(e => this.entities.push(e))
+    for (const e of entities) {
+      e.id = this.lastEntityId++
+      this.entities.push(e)
+    }
   }
   /**
    * Initialization; create all systems
@@ -272,4 +276,8 @@ class ECS {
     }
     if (this.running) window.requestAnimationFrame(loopFunc)
   }
+}
+
+Math.random_between = (min, max) => {
+  return Math.random() * (max - min) + min;
 }
