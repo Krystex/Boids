@@ -71,13 +71,16 @@ class RunECSSystem extends System {
     const runbutton = document.querySelector("#runbutton")
     const tickbutton = document.querySelector("#tickbutton")
     runbutton.onclick = () => {
-      ecs.running = !ecs.running
+      ecs.pause()
       runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
       ecs.run()
     }
     tickbutton.onclick = () => {
+      if (!ecs.running) {
+        ecs.startTime = new Date().getTime() - 32
       ecs.tick()
     }
+  }
   }
   beforeTick() {}
   onEntity(_) {}
