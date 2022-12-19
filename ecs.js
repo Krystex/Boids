@@ -57,6 +57,15 @@ class Vec2 {
   }
 
   /**
+   * Division
+   * @param {*} scalar scalar value
+   * @returns {Vec2}
+   */
+  div(scalar) {
+    return new Vec2(this.x / scalar, this.y / scalar)
+  }
+
+  /**
    * Magnitude of vector
    * @returns {number} magnitude
    */
