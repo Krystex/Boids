@@ -134,11 +134,10 @@ class BoidSystem extends System {
       /// Approach one: position
       const seperationFactor = 0.5
       let force = new Vec2(0, 0)
-      for (const nearBoid of nearBoids) {
-        const dist = this.distanceMap[entity.id][nearBoid.id]
+        // const dist = this.distanceMap[entity.id][nearBoid.id]
+        // const inverseDistance = 1. / dist
         const otherPos = nearBoid.components.position.pos
-        const inverseDistance = 1. / dist
-        const away = world.pos.sub(otherPos).mul(inverseDistance)
+        const away = world.pos.sub(otherPos) //.mul(inverseDistance)
         force = force.add(away)
       }
       force = force.mul(seperationFactor)
