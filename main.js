@@ -1,6 +1,6 @@
 const PositionComponent = new Component("position", {pos: new Vec2(), vel: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
-const LineDrawableComponent = new Component("line", {})
+const LineDrawableComponent = new Component("line", {color: "#FFFFFF", width: 1})
 const BoidComponent = new Component("boid", {predator: false})
 
 const ecs = new ECS({
@@ -63,7 +63,8 @@ class CanvasRenderSystem extends System {
       this.ctx.beginPath()
       this.ctx.moveTo(_a.x, _a.y)
       this.ctx.lineTo(_b.x, _b.y)
-      this.ctx.strokeStyle = "#FFFFFF";
+      this.ctx.strokeStyle = entity.components.line.color
+      this.ctx.lineWidth = entity.components.line.width
       this.ctx.stroke()
     }
   }
@@ -91,9 +92,16 @@ class RunECSSystem extends System {
   onEntity(_) {}
 }
 class BoidSystem extends System {
-  constructor() {
+  constructor(ecs) {
     super([PositionComponent, BoidComponent])
     this.distanceMap = {}
+
+    for (let e of ecs.entities.filter(e => e.components.boid)) {
+      if (e.components.boid.predator) {
+        e.components.line.color = "red"
+        e.components.line.width = 2
+      }
+    }
   }
   beforeTick(ecs) {
     // Create distance map: length from one point to every other point
@@ -193,14 +201,15 @@ class BoidSystem extends System {
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
-for (let i=0; i<30; i++) {
+for (let i=0; i<31; i++) {
   const bound = ecs.globals.bound
   let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
   boid.components.position.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
   boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
   ecs.addEntities([boid])
 }
-
+// Make last boid a predator
+ecs.entities[30].components.boid.predator = true
 // a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 // a.components.position.pos = new Vec2(0, 0)
 // a.components.position.vel = new Vec2(30, -15)
