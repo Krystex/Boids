@@ -229,13 +229,14 @@ class System {
   }
 }
 class ECS {
-  constructor() {
+  constructor(globals) {
     this.systems = []
     this.entities = []
     this.running = false
     this.lastEntityId = 0
     this.startTime = new Date().getTime()
     this.deltaTime = 0
+    this.globals = globals
   }
   /**
    * @param {Array<System>} systems 

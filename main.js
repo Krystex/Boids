@@ -3,12 +3,15 @@ const RenderableComponent = new Component("renderable", {visible: true})
 const LineDrawableComponent = new Component("line", {})
 const BoidComponent = new Component("boid", {predator: false})
 
-const ecs = new ECS()
+const ecs = new ECS({
+  // Bounds of field
+  bound: new Vec2(400, 400)
+})
 class PhysicsSystem extends System {
-  constructor() {
+  constructor(ecs) {
     super([PositionComponent])
     this.hookComponents = [PositionComponent]
-    this.bounds = {minx: 0, miny: 0, maxx: 400, maxy: 400}
+    this.bounds = {minx: 0, miny: 0, maxx: ecs.globals.bound.x, maxy: ecs.globals.bound.y}
   }
   beforeTick(_) {}
   onEntity(ecs, entity) {
@@ -103,7 +106,7 @@ class BoidSystem extends System {
       }
     }
   }
-  onEntity(_, entity) {
+  onEntity(ecs, entity) {
     // Calculate near boids
     const calculateNearBoids = (maxDistance) => {
       let list = []
@@ -122,13 +125,14 @@ class BoidSystem extends System {
     const margin = 50
     const nudgeFactor = 1.3
     const world = entity.components.position
+    const bound = ecs.globals.bound
     if (world.pos.x < margin) {
       world.vel.x += nudgeFactor
-    } else if (world.pos.x > (400 - margin)) {
+    } else if (world.pos.x > (bound.x - margin)) {
       world.vel.x -= nudgeFactor
     } else if (world.pos.y < margin) {
       world.vel.y += nudgeFactor
-    } else if (world.pos.y > (400 - margin)) {
+    } else if (world.pos.y > (bound.y - margin)) {
       world.vel.y -= nudgeFactor
     }
     
@@ -190,8 +194,9 @@ class BoidSystem extends System {
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
 for (let i=0; i<30; i++) {
+  const bound = ecs.globals.bound
   let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-  boid.components.position.pos = new Vec2(Math.random() * 400, Math.random() * 400)
+  boid.components.position.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
   boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
   ecs.addEntities([boid])
 }
