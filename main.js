@@ -1,6 +1,7 @@
 const PositionComponent = new Component("position", {pos: new Vec2(), vel: new Vec2(), rot: 0})
 const RenderableComponent = new Component("renderable", {visible: true})
 const LineDrawableComponent = new Component("line", {})
+const BoidComponent = new Component("boid", {predator: false})
 
 const ecs = new ECS()
 class PhysicsSystem extends System {
@@ -77,7 +78,8 @@ class RunECSSystem extends System {
     }
     tickbutton.onclick = () => {
       if (!ecs.running) {
-        ecs.startTime = new Date().getTime() - 32
+        // Simulate 30fps tick -> 33ms
+        ecs.startTime = new Date().getTime() - 33
         ecs.tick()
       }
     }
@@ -87,7 +89,7 @@ class RunECSSystem extends System {
 }
 class BoidSystem extends System {
   constructor() {
-    super([PositionComponent])
+    super([PositionComponent, BoidComponent])
     this.distanceMap = {}
   }
   beforeTick(ecs) {
@@ -161,13 +163,11 @@ class BoidSystem extends System {
 
     /// 2. Try to match velocity
     const velocityFactor = 0.1
-    // console.log("sumVel", sumVelocity)
     if (nearBoidsMatchVelocity.length > 1) {
       const sumVelocity = nearBoidsMatchVelocity
         .map(b => b.components.position.vel)
         .reduce((acc, vel) => acc.add(vel), new Vec2(0,0))
       const avgVelocity = sumVelocity.div(nearBoidsMatchVelocity.length).mul(velocityFactor) // sumVelocity / nearBoidsMatchVelocity.length * velocityFactor
-      // console.log("avgVel", avgVelocity)
       world.vel = world.vel.add(avgVelocity)
     }
 
@@ -190,7 +190,7 @@ class BoidSystem extends System {
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
 for (let i=0; i<30; i++) {
-  let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
+  let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
   boid.components.position.pos = new Vec2(Math.random() * 400, Math.random() * 400)
   boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
   ecs.addEntities([boid])
