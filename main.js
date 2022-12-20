@@ -112,7 +112,8 @@ class BoidSystem extends System {
       }
       return list
     }
-    const nearBoids = calculateNearBoids(20.)
+    const nearBoidsSeparation = calculateNearBoids(20.)
+    const nearBoidsMatchVelocity = calculateNearBoids(30.)
     const nearBoidsCentering = calculateNearBoids(40.)
 
     // 0. Avoid borders
@@ -129,25 +130,25 @@ class BoidSystem extends System {
       world.vel.y -= nudgeFactor
     }
     
-    // 1. Seperation
+    // 1. Separation
     if (true) {
       /// Approach one: position
-      const seperationFactor = 0.5
+      const separationFactor = 0.1
       let force = new Vec2(0, 0)
+      for (const nearBoid of nearBoidsSeparation) {
         // const dist = this.distanceMap[entity.id][nearBoid.id]
         // const inverseDistance = 1. / dist
         const otherPos = nearBoid.components.position.pos
         const away = world.pos.sub(otherPos) //.mul(inverseDistance)
         force = force.add(away)
       }
-      force = force.mul(seperationFactor)
-      world.vel = world.vel.add(force)
+      world.vel = world.vel.add(force.mul(separationFactor))
     } else {
       /// Approach two: velocity
       const factor = 0.5
       const oldMagnitude = entity.components.position.vel.magnitude() // Save current magnitude, so we can restore it later
       let force = new Vec2(0, 0)
-      for (const nearBoid of nearBoids) {
+      for (const nearBoid of nearBoidsSeparation) {
         const dist = this.distanceMap[entity.id][nearBoid.id]
         const selfVel = entity.components.position.vel
         const otherVel = nearBoid.components.position.vel
@@ -161,17 +162,17 @@ class BoidSystem extends System {
     /// 2. Try to match velocity
     const velocityFactor = 0.1
     // console.log("sumVel", sumVelocity)
-    if (nearBoids.length > 1) {
-      const sumVelocity = nearBoids
+    if (nearBoidsMatchVelocity.length > 1) {
+      const sumVelocity = nearBoidsMatchVelocity
         .map(b => b.components.position.vel)
         .reduce((acc, vel) => acc.add(vel), new Vec2(0,0))
-      const avgVelocity = sumVelocity.div(nearBoids.length).mul(velocityFactor) // sumVelocity / nearBoids.length * velocityFactor
+      const avgVelocity = sumVelocity.div(nearBoidsMatchVelocity.length).mul(velocityFactor) // sumVelocity / nearBoidsMatchVelocity.length * velocityFactor
       // console.log("avgVel", avgVelocity)
       world.vel = world.vel.add(avgVelocity)
     }
 
     /// 3. Centering
-    const centeringFactor = 1.
+    const centeringFactor = 0.0  // currently disabled
     if (nearBoidsCentering.length > 2) {
       const sumPosition = nearBoidsCentering
         .reduce((acc, e) => acc.add(e.components.position.pos), new Vec2(0,0))
