@@ -95,6 +95,7 @@ class BoidSystem extends System {
   constructor(ecs) {
     super([PositionComponent, BoidComponent])
     this.distanceMap = {}
+    this.predators = []
 
     for (let e of ecs.entities.filter(e => e.components.boid)) {
       if (e.components.boid.predator) {
@@ -113,8 +114,12 @@ class BoidSystem extends System {
         }
       }
     }
+    this.predators = ecs.entities.filter(e => e.components.boid.predator)
   }
   onEntity(ecs, entity) {
+    // Speed limit
+    const speedLimit = 25.
+
     // Calculate near boids
     const calculateNearBoids = (maxDistance) => {
       let list = []
@@ -128,6 +133,8 @@ class BoidSystem extends System {
     const nearBoidsSeparation = calculateNearBoids(20.)
     const nearBoidsMatchVelocity = calculateNearBoids(30.)
     const nearBoidsCentering = calculateNearBoids(40.)
+
+    const isPredator = entity.components.boid.predator
 
     // 0. Avoid borders
     const margin = 50
@@ -173,6 +180,12 @@ class BoidSystem extends System {
       entity.components.position.vel = entity.components.position.vel.unit().mul(oldMagnitude)
     }
 
+    // Don't match velocity / center if you are a predator
+    if (isPredator) {
+      world.vel = world.vel.unit().mul(speedLimit)
+      return
+    }
+
     /// 2. Try to match velocity
     const velocityFactor = 0.1
     if (nearBoidsMatchVelocity.length > 1) {
@@ -193,8 +206,19 @@ class BoidSystem extends System {
       world.vel = world.vel.sub(direction)
     }
 
+    /// 4. Get away from predators
+    const predatorDetectionRange = 20.
+    const predatorFactor = .5
+    let predatorForce = new Vec2()
+    for (const pred of this.predators) {
+      const dist = Vec2.dist(pred.components.position.pos, world.pos)
+      if (dist < predatorDetectionRange) {
+        predatorForce = predatorForce.add(world.pos.sub(pred.components.position.pos))
+      }
+    }
+    world.vel = world.vel.add(predatorForce.mul(predatorFactor))
+
     /// Limit speed
-    const speedLimit = 25.
     world.vel = world.vel.unit().mul(speedLimit)
   }
 }
