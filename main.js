@@ -19,10 +19,10 @@ class PhysicsSystem extends System {
     // Compute velocity dependend on elapsed time
     vel = vel.mul(ecs.deltaTime / 1000)
     // Respect bounds
-    if (pos.x < this.bounds.minx) pos.x = this.bounds.maxx
-    if (pos.x > this.bounds.maxx) pos.x = this.bounds.minx
-    if (pos.y < this.bounds.miny) pos.y = this.bounds.maxy
-    if (pos.y > this.bounds.maxy) pos.y = this.bounds.miny
+    if (pos.x < this.bounds.minx) pos.x = this.bounds.minx + 1
+    if (pos.x > this.bounds.maxx) pos.x = this.bounds.maxx - 1
+    if (pos.y < this.bounds.miny) pos.y = this.bounds.miny + 1
+    if (pos.y > this.bounds.maxy) pos.y = this.bounds.maxz - 1
     // Compute new position (add velocity to position)
     entity.components.position.pos = pos.add(vel)
     if (entity.components.line) {
