@@ -151,6 +151,20 @@ class BoidSystem extends System {
       world.vel.y -= nudgeFactor
     }
     
+    // As predator: try to attack (follow) next boid in your proximity
+    if (isPredator) {
+      const attackFactor = 0.1
+      if (nearBoidsCentering.length > 0) {
+        const nearBoid = nearBoidsCentering[0]
+        const otherPos = nearBoid.components.position.pos
+        const force = otherPos.sub(world.pos)
+        world.vel = world.vel.add(force.mul(attackFactor))
+      }
+
+      world.vel = world.vel.unit().mul(speedLimit - 5)
+      return  // don't do things normal boids do
+    }
+    
     // 1. Separation
     if (true) {
       /// Approach one: position
@@ -165,7 +179,7 @@ class BoidSystem extends System {
       }
       world.vel = world.vel.add(force.mul(separationFactor))
     } else {
-      /// Approach two: velocity
+      /// Approach two: velocity (not used for now)
       const factor = 0.5
       const oldMagnitude = entity.components.position.vel.magnitude() // Save current magnitude, so we can restore it later
       let force = new Vec2(0, 0)
@@ -178,12 +192,6 @@ class BoidSystem extends System {
       force = force.mul(factor)
       entity.components.position.vel = entity.components.position.vel.add(force)
       entity.components.position.vel = entity.components.position.vel.unit().mul(oldMagnitude)
-    }
-
-    // Don't match velocity / center if you are a predator
-    if (isPredator) {
-      world.vel = world.vel.unit().mul(speedLimit)
-      return
     }
 
     /// 2. Try to match velocity
