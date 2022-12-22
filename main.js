@@ -233,15 +233,18 @@ class BoidSystem extends System {
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
-for (let i=0; i<31; i++) {
+for (let i=0; i<40; i++) {
   const bound = ecs.globals.bound
   let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
   boid.components.position.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
   boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
   ecs.addEntities([boid])
 }
-// Make last boid a predator
-ecs.entities[30].components.boid.predator = true
+// Make two boid a predator
+const numEntities = ecs.entities.length
+ecs.entities[numEntities-1].components.boid.predator = true
+ecs.entities[numEntities-2].components.boid.predator = true
+
 // a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
 // a.components.position.pos = new Vec2(0, 0)
 // a.components.position.vel = new Vec2(30, -15)
