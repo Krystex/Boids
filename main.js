@@ -105,16 +105,17 @@ class BoidSystem extends System {
     }
   }
   beforeTick(ecs) {
-    // Create distance map: length from one point to every other point
-    for (const a of ecs.entities) {
-      this.distanceMap[a.id] = {}
-      for (const b of ecs.entities) {
-        if (a.id !== b.id) {
-          this.distanceMap[a.id][b.id] = Vec2.dist(ecs.entities[a.id].components.position.pos, ecs.entities[b.id].components.position.pos)
-        }
+    // Create distance map: distance from one point to every other point
+    for (let i=0; i<ecs.entities.length; i++) {
+      this.distanceMap[i] = {}
+      for (let j=0; j<i; j++) {
+        this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.position.pos, ecs.entities[j].components.position.pos)
       }
     }
     this.predators = ecs.entities.filter(e => e.components.boid.predator)
+  }
+  getDist(a, b) {
+    return a > b ? this.distanceMap[a][b] : this.distanceMap[b][a]
   }
   onEntity(ecs, entity) {
     // Speed limit
@@ -123,9 +124,11 @@ class BoidSystem extends System {
     // Calculate near boids
     const calculateNearBoids = (maxDistance) => {
       let list = []
-      for (const [oEntityId, distance] of Object.entries(this.distanceMap[entity.id])) {
-        if (distance < maxDistance) {
-          list.push(ecs.entities[oEntityId])
+      for (let i=0; i<ecs.entities.length; i++) {
+        if (entity.id !== i) {
+          if (this.getDist(entity.id, i) < maxDistance) {
+            list.push(ecs.entities[i])
+          }
         }
       }
       return list
@@ -150,7 +153,7 @@ class BoidSystem extends System {
     } else if (world.pos.y > (bound.y - margin)) {
       world.vel.y -= nudgeFactor
     }
-    
+
     // As predator: try to attack (follow) next boid in your proximity
     if (isPredator) {
       const attackFactor = 0.1
@@ -245,11 +248,11 @@ const numEntities = ecs.entities.length
 ecs.entities[numEntities-1].components.boid.predator = true
 ecs.entities[numEntities-2].components.boid.predator = true
 
-// a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
-// a.components.position.pos = new Vec2(0, 0)
-// a.components.position.vel = new Vec2(30, -15)
-// b = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent])
-// b.components.position.pos = new Vec2(0, 200)
+// a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+// a.components.position.pos = new Vec2(51, 150)
+// a.components.position.vel = new Vec2(30, 15)
+// b = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+// b.components.position.pos = new Vec2(51, 200)
 // b.components.position.vel = new Vec2(30, 0)
 // ecs.addEntities([a, b])
 
