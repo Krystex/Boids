@@ -1,4 +1,4 @@
-const PositionComponent = new Component("position", {pos: new Vec2(), vel: new Vec2(), rot: 0})
+const WorldComponent = new Component("world", {pos: new Vec2(), vel: new Vec2()})
 const RenderableComponent = new Component("renderable", {visible: true})
 const LineDrawableComponent = new Component("line", {color: "#FFFFFF", width: 1})
 const BoidComponent = new Component("boid", {predator: false})
@@ -9,13 +9,13 @@ const ecs = new ECS({
 })
 class PhysicsSystem extends System {
   constructor(ecs) {
-    super([PositionComponent])
-    this.hookComponents = [PositionComponent]
+    super([WorldComponent])
+    this.hookComponents = [WorldComponent]
     this.bounds = {minx: 0, miny: 0, maxx: ecs.globals.bound.x, maxy: ecs.globals.bound.y}
   }
   beforeTick(_) {}
   onEntity(ecs, entity) {
-    let {pos, vel} = entity.components.position
+    let {pos, vel} = entity.components.world
     // Compute velocity dependend on elapsed time
     vel = vel.mul(ecs.deltaTime / 1000)
     // Respect bounds
@@ -24,11 +24,11 @@ class PhysicsSystem extends System {
     if (pos.y < this.bounds.miny) pos.y = this.bounds.miny + 1
     if (pos.y > this.bounds.maxy) pos.y = this.bounds.maxz - 1
     // Compute new position (add velocity to position)
-    entity.components.position.pos = pos.add(vel)
+    entity.components.world.pos = pos.add(vel)
     if (entity.components.line) {
       const trans = Mat3x3.translation(pos.x, pos.y)
       // const rot = Mat3x3.rotation(vel.angle())
-      entity.components.world = {
+      entity.components._world = {
         _a: trans.mul(new Vec2(0, 0)),
         _b: trans.mul(vel.unit().mul(10)),
       }
@@ -37,7 +37,7 @@ class PhysicsSystem extends System {
 }
 class CanvasRenderSystem extends System {
   constructor() {
-    super([PositionComponent])
+    super([WorldComponent])
     this.canvas = document.getElementById("canvas")
     this.ctx = canvas.getContext("2d")
 
@@ -59,7 +59,7 @@ class CanvasRenderSystem extends System {
   }
   onEntity(_, entity) {
     if (entity.components.line) {
-      const { _a, _b } = entity.components.world
+      const { _a, _b } = entity.components._world
       this.ctx.beginPath()
       this.ctx.moveTo(_a.x, _a.y)
       this.ctx.lineTo(_b.x, _b.y)
@@ -93,7 +93,7 @@ class RunECSSystem extends System {
 }
 class BoidSystem extends System {
   constructor(ecs) {
-    super([PositionComponent, BoidComponent])
+    super([WorldComponent, BoidComponent])
     this.distanceMap = {}
     this.predators = []
 
@@ -109,7 +109,7 @@ class BoidSystem extends System {
     for (let i=0; i<ecs.entities.length; i++) {
       this.distanceMap[i] = {}
       for (let j=0; j<i; j++) {
-        this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.position.pos, ecs.entities[j].components.position.pos)
+        this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.world.pos, ecs.entities[j].components.world.pos)
       }
     }
     this.predators = ecs.entities.filter(e => e.components.boid.predator)
@@ -142,7 +142,7 @@ class BoidSystem extends System {
     // 0. Avoid borders
     const margin = 50
     const nudgeFactor = 1.3
-    const world = entity.components.position
+    const world = entity.components.world
     const bound = ecs.globals.bound
     if (world.pos.x < margin) {
       world.vel.x += nudgeFactor
@@ -159,7 +159,7 @@ class BoidSystem extends System {
       const attackFactor = 0.1
       if (nearBoidsCentering.length > 0) {
         const nearBoid = nearBoidsCentering[0]
-        const otherPos = nearBoid.components.position.pos
+        const otherPos = nearBoid.components.world.pos
         const force = otherPos.sub(world.pos)
         world.vel = world.vel.add(force.mul(attackFactor))
       }
@@ -176,7 +176,7 @@ class BoidSystem extends System {
       for (const nearBoid of nearBoidsSeparation) {
         // const dist = this.distanceMap[entity.id][nearBoid.id]
         // const inverseDistance = 1. / dist
-        const otherPos = nearBoid.components.position.pos
+        const otherPos = nearBoid.components.world.pos
         const away = world.pos.sub(otherPos) //.mul(inverseDistance)
         force = force.add(away)
       }
@@ -184,24 +184,24 @@ class BoidSystem extends System {
     } else {
       /// Approach two: velocity (not used for now)
       const factor = 0.5
-      const oldMagnitude = entity.components.position.vel.magnitude() // Save current magnitude, so we can restore it later
+      const oldMagnitude = entity.components.world.vel.magnitude() // Save current magnitude, so we can restore it later
       let force = new Vec2(0, 0)
       for (const nearBoid of nearBoidsSeparation) {
         const dist = this.distanceMap[entity.id][nearBoid.id]
-        const selfVel = entity.components.position.vel
-        const otherVel = nearBoid.components.position.vel
+        const selfVel = entity.components.world.vel
+        const otherVel = nearBoid.components.world.vel
         force = force.add(otherVel.sub(selfVel).mul(1 / dist))
       }
       force = force.mul(factor)
-      entity.components.position.vel = entity.components.position.vel.add(force)
-      entity.components.position.vel = entity.components.position.vel.unit().mul(oldMagnitude)
+      entity.components.world.vel = entity.components.world.vel.add(force)
+      entity.components.world.vel = entity.components.world.vel.unit().mul(oldMagnitude)
     }
 
     /// 2. Try to match velocity
     const velocityFactor = 0.1
     if (nearBoidsMatchVelocity.length > 1) {
       const sumVelocity = nearBoidsMatchVelocity
-        .map(b => b.components.position.vel)
+        .map(b => b.components.world.vel)
         .reduce((acc, vel) => acc.add(vel), new Vec2(0,0))
       const avgVelocity = sumVelocity.div(nearBoidsMatchVelocity.length).mul(velocityFactor) // sumVelocity / nearBoidsMatchVelocity.length * velocityFactor
       world.vel = world.vel.add(avgVelocity)
@@ -211,7 +211,7 @@ class BoidSystem extends System {
     const centeringFactor = 0.0  // currently disabled
     if (nearBoidsCentering.length > 2) {
       const sumPosition = nearBoidsCentering
-        .reduce((acc, e) => acc.add(e.components.position.pos), new Vec2(0,0))
+        .reduce((acc, e) => acc.add(e.components.world.pos), new Vec2(0,0))
       const avgPos = sumPosition.div(nearBoidsCentering.length)
       const direction = world.pos.sub(avgPos).mul(centeringFactor)
       world.vel = world.vel.sub(direction)
@@ -222,9 +222,9 @@ class BoidSystem extends System {
     const predatorFactor = .5
     let predatorForce = new Vec2()
     for (const pred of this.predators) {
-      const dist = Vec2.dist(pred.components.position.pos, world.pos)
+      const dist = Vec2.dist(pred.components.world.pos, world.pos)
       if (dist < predatorDetectionRange) {
-        predatorForce = predatorForce.add(world.pos.sub(pred.components.position.pos))
+        predatorForce = predatorForce.add(world.pos.sub(pred.components.world.pos))
       }
     }
     world.vel = world.vel.add(predatorForce.mul(predatorFactor))
@@ -238,9 +238,9 @@ ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
 for (let i=0; i<40; i++) {
   const bound = ecs.globals.bound
-  let boid = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-  boid.components.position.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
-  boid.components.position.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
+  let boid = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+  boid.components.world.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
+  boid.components.world.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
   ecs.addEntities([boid])
 }
 // Make two boid a predator
@@ -248,12 +248,12 @@ const numEntities = ecs.entities.length
 ecs.entities[numEntities-1].components.boid.predator = true
 ecs.entities[numEntities-2].components.boid.predator = true
 
-// a = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-// a.components.position.pos = new Vec2(51, 150)
-// a.components.position.vel = new Vec2(30, 15)
-// b = new Entity([PositionComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-// b.components.position.pos = new Vec2(51, 200)
-// b.components.position.vel = new Vec2(30, 0)
+// a = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+// a.components.world.pos = new Vec2(51, 150)
+// a.components.world.vel = new Vec2(30, 15)
+// b = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+// b.components.world.pos = new Vec2(51, 200)
+// b.components.world.vel = new Vec2(30, 0)
 // ecs.addEntities([a, b])
 
 ecs.init()
