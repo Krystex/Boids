@@ -213,6 +213,10 @@ class Component {
   }
 }
 class Entity {
+  /**
+   * Construct entity
+   * @param {Array<Component>} initialComponents Components which the entity will hold. They will be constructed by calling the `.new()` method
+   */
   constructor(initialComponents) {
     this.components = {}
     for (let component of initialComponents) {
@@ -222,13 +226,20 @@ class Entity {
 }
 class System {
   /**
-   * @param {Array<Component>} hookComponents 
+   * @param {Array<Component>} hookComponents Components which system gets hooked in. 
    */
   constructor(hookComponents) {
     this.hookComponents = hookComponents
   }
+  onEntity() {
+    alert("you need to implement the System.onEntity method!")
+  }
 }
 class ECS {
+  /**
+   * Construct ECS which holds and manages systems, entities
+   * @param {Object} globals Potential global settings every system can access
+   */
   constructor(globals) {
     this.systems = []
     this.entities = []
@@ -294,6 +305,9 @@ class ECS {
     if (this.running) window.requestAnimationFrame(loopFunc)
   }
 
+  /**
+   * Stop running loop
+   */
   pause() {
     if (this.running) {
       this.running = false
