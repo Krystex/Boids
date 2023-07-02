@@ -106,10 +106,11 @@ class BoidSystem extends System {
   }
   beforeTick(ecs) {
     // Create distance map: distance from one point to every other point
-    for (let i=0; i<ecs.entities.length; i++) {
-      this.distanceMap[i] = {}
-      for (let j=0; j<i; j++) {
-        this.distanceMap[i][j] = Vec2.dist(ecs.entities[i].components.world.pos, ecs.entities[j].components.world.pos)
+    this.distanceMap = {}
+    for (const a of ecs.entities) {
+      this.distanceMap[a.id] = {}
+      for (const b of ecs.entities) {
+        this.distanceMap[a.id][b.id] = Vec2.dist(a.components.world.pos, b.components.world.pos)
       }
     }
     this.predators = ecs.entities.filter(e => e.components.boid.predator)
@@ -123,15 +124,7 @@ class BoidSystem extends System {
 
     // Calculate near boids
     const calculateNearBoids = (maxDistance) => {
-      let list = []
-      for (let i=0; i<ecs.entities.length; i++) {
-        if (entity.id !== i) {
-          if (this.getDist(entity.id, i) < maxDistance) {
-            list.push(ecs.entities[i])
-          }
-        }
-      }
-      return list
+      return ecs.entities.filter(e => (entity.id !== e.id && this.getDist(entity.id, e.id) < maxDistance))
     }
     const nearBoidsSeparation = calculateNearBoids(20.)
     const nearBoidsMatchVelocity = calculateNearBoids(30.)
@@ -236,17 +229,19 @@ class BoidSystem extends System {
 
 ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
 
-for (let i=0; i<40; i++) {
-  const bound = ecs.globals.bound
-  let boid = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-  boid.components.world.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
-  boid.components.world.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
-  ecs.addEntities([boid])
+const generateBoids = (num, predator=false) => {
+  for (let i=0; i<num; i++) {
+    const bound = ecs.globals.bound
+    let boid = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
+    boid.components.boid.predator = predator
+    boid.components.world.pos = new Vec2(Math.random() * bound.x, Math.random() * bound.y)
+    boid.components.world.vel = new Vec2(Math.random_between(-30, 30), Math.random_between(-30, 30)).unit().mul(3)
+    ecs.addEntities([boid])
+  }
 }
-// Make two boid a predator
-const numEntities = ecs.entities.length
-ecs.entities[numEntities-1].components.boid.predator = true
-ecs.entities[numEntities-2].components.boid.predator = true
+
+generateBoids(40, false)
+generateBoids(2, true)
 
 // a = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
 // a.components.world.pos = new Vec2(51, 150)
