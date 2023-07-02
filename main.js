@@ -242,7 +242,7 @@ class BoidSystem extends System {
   }
 }
 
-ecs.addSystems([PhysicsSystem, CanvasRenderSystem, BoidSystem, RunECSSystem])
+ecs.addSystems([PhysicsSystem, BoidSystem, RunECSSystem, CanvasRenderSystem])
 
 const generateBoids = (num, predator=false) => {
   for (let i=0; i<num; i++) {
