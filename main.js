@@ -75,6 +75,20 @@ class RunECSSystem extends System {
 
     const runbutton = document.querySelector("#runbutton")
     const tickbutton = document.querySelector("#tickbutton")
+    const numBoidsInput = document.querySelector("#numboidsinput")
+    const numPredatorsInput = document.querySelector("#numpredatorsinput")
+    numBoidsInput.onfocusout = () => {
+      const numBoids = parseInt(numBoidsInput.value)
+      ecs.entities = ecs.entities.filter(e => e.components.boid.predator !== false)
+      generateBoids(numBoids, false)
+      ecs.tick()
+    }
+    numPredatorsInput.onfocusout = () => {
+      const numPredators = parseInt(numPredatorsInput.value)
+      ecs.entities = ecs.entities.filter(e => e.components.boid.predator !== true)
+      generateBoids(numPredators, true)
+      ecs.tick()
+    }
     runbutton.onclick = () => {
       ecs.pause()
       runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
@@ -96,15 +110,16 @@ class BoidSystem extends System {
     super([WorldComponent, BoidComponent])
     this.distanceMap = {}
     this.predators = []
-
-    for (let e of ecs.entities.filter(e => e.components.boid)) {
+  }
+  beforeTick(ecs) {
+    // In case new entities got added: set color for predators
+    ecs.entities.filter(e => e.components.boid).map(e => {
       if (e.components.boid.predator) {
         e.components.line.color = "red"
         e.components.line.width = 2
       }
-    }
-  }
-  beforeTick(ecs) {
+      return e
+    })
     // Create distance map: distance from one point to every other point
     this.distanceMap = {}
     for (const a of ecs.entities) {

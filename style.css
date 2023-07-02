@@ -30,3 +30,18 @@ canvas {
 .main-container {
   display: inline;
 }
+
+input {
+  background-color: #3B3B3B;
+  color: #fff;
+  font-size: 11pt;
+  border: 0;
+  border-radius: 5px;
+  appearance: none;
+  margin: 1px;
+  outline: none;
+}
+#numboidsinput, #numpredatorsinput {
+  width: 4em;
+  text-align: center;
+}
