@@ -1,13 +1,11 @@
 # 🐦 Boids 🐦
 
-Experimental boid simulation with custom ECS (Entity Component System).
-
-
+Experimental boid simulation with a custom Entity Component System, see on the [Online Demo](https://krystex.github.io/Boids/).
 
 https://user-images.githubusercontent.com/5840423/208698278-3c944ab0-d516-487c-8c22-016e5839dc9f.mov
 
 Implemented to study the Entity Component System pattern.
-Everything is implemented in vanilla JS, including a small basic linear algebra library.
+Everything is implemented in vanilla JS, including a tiny linear algebra library.
 
 To run the project, simply clone the repository and open `index.html`.
 
@@ -27,10 +25,11 @@ The **entity component system** has three essential primitives:
 
 
 ## Lessons learned
-Findings for ECS:
 - it's pretty cool to decouple objects from the actual logic
 - however, data interaction between different systems can be messy (`BoidSystem` modifies velocity vector, `PhysicsSystem` applies velocity too)
 - therefore, processing order is important
+- sometimes it's hard to decide to choose where the code is gonna go
+- shared mutable state can be a problem. what are my entities doing?
 - this has nothing to do with the ECS, but linear algebra in JS is not great to work. no operator overloading is not nice
 
 
