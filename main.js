@@ -83,12 +83,18 @@ class RunECSSystem extends System {
       generateBoids(numBoids, false)
       ecs.tick()
     }
+    numBoidsInput.addEventListener("keypress", e => {
+      if (e.key == "Enter") { numBoidsInput.onfocusout() }
+    })
     numPredatorsInput.onfocusout = () => {
       const numPredators = parseInt(numPredatorsInput.value)
       ecs.entities = ecs.entities.filter(e => e.components.boid.predator !== true)
       generateBoids(numPredators, true)
       ecs.tick()
     }
+    numPredatorsInput.addEventListener("keypress", e => {
+      if (e.key == "Enter") { numPredatorsInput.onfocusout() }
+    })
     runbutton.onclick = () => {
       ecs.pause()
       runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
