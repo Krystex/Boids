@@ -269,6 +269,11 @@ class ECS {
    */
   init() {
     this.systems = this.systems.map(system => new system(this))
+    // Assemble all entities for systems in array, so system can access all entites with `this.entities`
+    for (const system of this.systems) {
+      const componentRequirements = system.hookComponents.map(comp => comp.name)
+      system.entities = this.entities.filter(e => componentRequirements.every(name => Object.keys(e.components).includes(name)))
+    }
   }
   /**
    * Executes one tick. This consists of

@@ -119,13 +119,10 @@ class BoidSystem extends System {
   }
   beforeTick(ecs) {
     // In case new entities got added: set color for predators
-    ecs.entities.filter(e => e.components.boid).map(e => {
-      if (e.components.boid.predator) {
-        e.components.line.color = "red"
-        e.components.line.width = 2
-      }
-      return e
-    })
+    for (const e of this.entities.filter(e => e.components.boid.predator)) {
+      e.components.line.color = "red"
+      e.components.line.width = 2
+    }
     // Create distance map: distance from one point to every other point
     this.distanceMap = {}
     for (const a of ecs.entities) {
@@ -134,7 +131,7 @@ class BoidSystem extends System {
         this.distanceMap[a.id][b.id] = Vec2.dist(a.components.world.pos, b.components.world.pos)
       }
     }
-    this.predators = ecs.entities.filter(e => e.components.boid.predator)
+    this.predators = this.entities.filter(e => e.components.boid.predator)
   }
   getDist(a, b) {
     return a > b ? this.distanceMap[a][b] : this.distanceMap[b][a]
@@ -145,7 +142,7 @@ class BoidSystem extends System {
 
     // Calculate near boids
     const calculateNearBoids = (maxDistance) => {
-      return ecs.entities.filter(e => (entity.id !== e.id && this.getDist(entity.id, e.id) < maxDistance))
+      return this.entities.filter(e => (entity.id !== e.id && this.getDist(entity.id, e.id) < maxDistance))
     }
     const nearBoidsSeparation = calculateNearBoids(20.)
     const nearBoidsMatchVelocity = calculateNearBoids(30.)
