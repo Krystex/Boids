@@ -12,16 +12,46 @@ To run the project, simply clone the repository and open `index.html`.
 ---
 
 The **entity component system** has three essential primitives:
-- **Entity**: basic object in scene, e.g. a `Boid`
-  
-  *One entity has multiple components*
-- **Component**: data which describes behaviour, e.g. `LineRenderable` with attributes color and width
+- **Entity**: basic object in scene, e.g. a `Boid`. it has no data by itself
+- **Component**: data which describes behaviour, e.g. `LineRenderable` with attributes color and width. component has only data, no actual behaviour 
+- **System**: actually implemented behaviour, e.g. `PhysicsSystem` which handles physics calculations
 
-  *One component only has data, no actual code*
-- **System**: actually implemented behaviour, e.g. `PhysicsSystem`
-  
-  *In main game loop, every system is executed. Method `onEntity` is executed for every available entity*
-  
+See for yourself:
+```javascript
+// construct Entity Component System with global variable `bound`
+const ecs = new ECS({bound: new Vec2(400, 400)})
+
+// construct physics components which has position and velocity of object
+const WorldComponent = new Component("world", {pos: new Vec2(), vel: new Vec2()})
+
+// construct system for handling physics
+class PhysicsSystem extends System {
+  constructor(ecs) {
+    // PhysicsSystems is bound to entities which have WorldComponent
+    super([WorldComponent])
+    // can access global variable
+    this.bounds = {minx: 0, miny: 0, maxx: ecs.globals.bound.x, maxx = ecs.globals.bound.y} 
+  }
+
+  // handler which is executed before tick
+  beforeTick(_) {}
+
+  // this method gets executed for every entity
+  onEntity(ecs, entity) {
+    // physics calculations
+  }
+}
+
+// create and add entity to ECS
+const exampleEntity = new Entity([WorldComponent])
+ecs.addEntities([exampleEntity])
+// add system to ECS
+ecs.addSystems([PhysicsSystem])
+// initialize ECS (creates actual systems)
+ecs.init()
+// run ECS in endless loop
+ecs.run()
+```
 
 
 ## Lessons learned
