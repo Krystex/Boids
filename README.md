@@ -7,7 +7,11 @@ https://user-images.githubusercontent.com/5840423/208698278-3c944ab0-d516-487c-8
 Implemented to study the Entity Component System pattern.
 Everything is implemented in vanilla JS, including a tiny linear algebra library.
 
-To run the project, simply clone the repository and open `index.html`.
+To run the project locally, simply clone the repository and open `index.html`.
+
+<p align="center">
+  <img src=".docs/SystemArchitecture.png" alt="drawing" width="300"/>
+</p>
 
 ---
 
