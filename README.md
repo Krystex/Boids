@@ -10,7 +10,7 @@ Everything is implemented in vanilla JS, including a tiny linear algebra library
 To run the project locally, simply clone the repository and open `index.html`.
 
 <p align="center">
-  <img src=".docs/SystemArchitecture.png" alt="drawing" width="300"/>
+  <img src=".docs/SystemArchitecture.png" alt="drawing" width="600"/>
 </p>
 
 ---
