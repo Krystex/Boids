@@ -264,4 +264,4 @@ generateBoids(2, true)
 ecs.init()
 ecs.tick()
 
-// ecs.run()
+ecs.run()
