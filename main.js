@@ -97,7 +97,7 @@ class RunECSSystem extends System {
     })
     runbutton.onclick = () => {
       ecs.pause()
-      runbutton.innerHTML = ecs.running ? `Stop` : `Run` 
+      runbutton.innerHTML = ecs.running ? `Stop` : `Run`
       ecs.run()
     }
     tickbutton.onclick = () => {
@@ -107,6 +107,7 @@ class RunECSSystem extends System {
         ecs.tick()
       }
     }
+    runbutton.innerHTML = ecs.running ? `Stop` : `Run`
   }
   beforeTick() {}
   onEntity(_) {}

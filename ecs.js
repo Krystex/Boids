@@ -243,7 +243,7 @@ class ECS {
   constructor(globals) {
     this.systems = []
     this.entities = []
-    this.running = false
+    this.running = true
     this.lastEntityId = 0
     this.startTime = new Date().getTime()
     this.deltaTime = 0
