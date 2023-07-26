@@ -261,14 +261,6 @@ const generateBoids = (num, predator=false) => {
 generateBoids(40, false)
 generateBoids(2, true)
 
-// a = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-// a.components.world.pos = new Vec2(51, 150)
-// a.components.world.vel = new Vec2(30, 15)
-// b = new Entity([WorldComponent, RenderableComponent, LineDrawableComponent, BoidComponent])
-// b.components.world.pos = new Vec2(51, 200)
-// b.components.world.vel = new Vec2(30, 0)
-// ecs.addEntities([a, b])
-
 ecs.init()
 ecs.tick()
 
