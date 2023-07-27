@@ -50,7 +50,7 @@ input {
   background-color: #a00;
   overflow: hidden;
   white-space: nowrap;
-  position: absolute;
+  position: fixed;
   right: -50px;
   top: 40px;
   -webkit-transform: rotate(45deg);
