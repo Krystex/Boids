@@ -126,9 +126,9 @@ class BoidSystem extends System {
     }
     // Create distance map: distance from one point to every other point
     this.distanceMap = {}
-    for (const a of ecs.entities) {
+    for (const a of this.entities) {
       this.distanceMap[a.id] = {}
-      for (const b of ecs.entities) {
+      for (const b of this.entities) {
         this.distanceMap[a.id][b.id] = Vec2.dist(a.components.world.pos, b.components.world.pos)
       }
     }
@@ -262,7 +262,6 @@ const generateBoids = (num, predator=false) => {
 generateBoids(40, false)
 generateBoids(2, true)
 
-ecs.init()
 ecs.tick()
 
 ecs.run()
