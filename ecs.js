@@ -250,10 +250,12 @@ class ECS {
     this.globals = globals
   }
   /**
+   * Add and initialize systems
    * @param {Array<System>} systems 
    */
   addSystems(systems) {
-    systems.forEach(s => this.systems.push(s))
+    // initialize systems
+    this.systems = [...this.systems, ...systems.map(s => new s(this))]
   }
   /**
    * @param {Array<Entity>} entities 
@@ -263,18 +265,19 @@ class ECS {
       e.id = this.lastEntityId++
       this.entities.push(e)
     }
+    this._assembleEntities()
   }
+
   /**
-   * Initialization; create all systems
+   * Assemble all entities for systems in array, so system can access all entites with `this.entities`
    */
-  init() {
-    this.systems = this.systems.map(system => new system(this))
-    // Assemble all entities for systems in array, so system can access all entites with `this.entities`
+  _assembleEntities() {
     for (const system of this.systems) {
       const componentRequirements = system.hookComponents.map(comp => comp.name)
       system.entities = this.entities.filter(e => componentRequirements.every(name => Object.keys(e.components).includes(name)))
     }
   }
+
   /**
    * Executes one tick. This consists of
    * - loop through all systems, execute `beforeTick` function
